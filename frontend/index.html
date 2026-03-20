@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark-space">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Recrunex — Fresh Jobs, Instantly</title>
+  <meta name="description" content="Find jobs posted in the last 24 hours. India & global. Recrunex by Veera Raghavulu." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <link rel="stylesheet" href="css/main.css" />
+  <link rel="stylesheet" href="css/components.css" />
+  <link rel="stylesheet" href="css/animations.css" />
+</head>
+<body>
+
+  <!-- ══ TOPBAR ══ -->
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a href="#" class="logo" id="logoHome">
+        <span class="logo-icon">◈</span>
+        <span class="logo-text">Recru<em>nex</em></span>
+      </a>
+
+      <nav class="topbar-nav">
+        <!-- Games dropdown -->
+        <div class="games-dropdown-wrap" id="gamesDropdownWrap">
+          <button class="nav-btn games-btn" id="gamesBtn">
+            <i class="fa-solid fa-gamepad"></i>
+            <span>Games</span>
+            <i class="fa-solid fa-chevron-down games-arrow"></i>
+          </button>
+          <div class="games-dropdown" id="gamesDropdown" hidden>
+            <div class="games-dropdown-header">🎮 Career Games</div>
+            <button class="game-item" data-game="quiz">
+              <span class="game-icon">🧠</span>
+              <div><strong>Career Quiz</strong><span>Which role suits you?</span></div>
+            </button>
+            <button class="game-item" data-game="salary">
+              <span class="game-icon">💰</span>
+              <div><strong>Salary Guesser</strong><span>Guess the pay range</span></div>
+            </button>
+            <button class="game-item" data-game="resume">
+              <span class="game-icon">📄</span>
+              <div><strong>Resume Roast</strong><span>Fix the bad resume</span></div>
+            </button>
+            <button class="game-item" data-game="interview">
+              <span class="game-icon">🎯</span>
+              <div><strong>Interview Blitz</strong><span>Answer in 10 seconds</span></div>
+            </button>
+          </div>
+        </div>
+
+        <button class="nav-btn" id="savedNavBtn">
+          <i class="fa-solid fa-bookmark"></i>
+          <span>Saved</span>
+          <span class="saved-count" id="savedCount" hidden>0</span>
+        </button>
+
+        <!-- Theme picker -->
+        <div class="theme-picker-wrap" id="themePickerWrap">
+          <button class="theme-toggle" id="themeToggle" title="Change theme">
+            <i class="fa-solid fa-palette"></i>
+          </button>
+          <div class="theme-picker" id="themePicker" hidden>
+            <button class="theme-opt" data-theme="dark-space" title="Dark Space"><span class="theme-swatch" style="background:linear-gradient(135deg,#09090f,#1a1035)"></span>Dark Space</button>
+            <button class="theme-opt" data-theme="dark-ocean" title="Dark Ocean"><span class="theme-swatch" style="background:linear-gradient(135deg,#060d1a,#0a2040)"></span>Dark Ocean</button>
+            <button class="theme-opt" data-theme="dark-forest" title="Dark Forest"><span class="theme-swatch" style="background:linear-gradient(135deg,#060e08,#0d2b14)"></span>Dark Forest</button>
+            <button class="theme-opt" data-theme="light-sky" title="Light Sky"><span class="theme-swatch" style="background:linear-gradient(135deg,#e8f4ff,#f5f9ff)"></span>Light Sky</button>
+            <button class="theme-opt" data-theme="light-peach" title="Light Peach"><span class="theme-swatch" style="background:linear-gradient(135deg,#fff5f0,#fef0e8)"></span>Light Peach</button>
+            <button class="theme-opt" data-theme="light-mint" title="Light Mint"><span class="theme-swatch" style="background:linear-gradient(135deg,#effffa,#f0fdf8)"></span>Light Mint</button>
+          </div>
+        </div>
+      </nav>
+    </div>
+  </header>
+
+  <!-- ══ HERO ══ -->
+  <section class="hero" id="heroSection">
+    <div class="hero-bg-grid"></div>
+    <div class="hero-orb hero-orb-1"></div>
+    <div class="hero-orb hero-orb-2"></div>
+    <div class="hero-inner">
+      <div class="hero-badge"><span class="pulse-dot"></span>Live · India & Global Jobs</div>
+      <h1 class="hero-title">Land Your Dream Job<br/><span class="title-accent">Posted Today</span></h1>
+      <p class="hero-sub">Fresh listings from The Muse, Remotive & Adzuna India — sorted by recency, not age.</p>
+
+      <div class="search-card" id="searchCard">
+        <div class="search-field-wrap">
+          <i class="fa-solid fa-magnifying-glass search-icon"></i>
+          <input type="text" id="searchInput" class="search-input" placeholder="Job title, skill, or company..." autocomplete="off" maxlength="100" />
+          <button class="clear-btn" id="clearSearch" hidden><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <div class="search-divider"></div>
+        <div class="search-field-wrap">
+          <i class="fa-solid fa-location-dot search-icon"></i>
+          <input type="text" id="locationInput" class="search-input" placeholder="Delhi, Bangalore, Remote..." autocomplete="off" maxlength="100" />
+        </div>
+        <button class="search-btn" id="searchBtn">
+          <span>Search</span><i class="fa-solid fa-arrow-right"></i>
+        </button>
+      </div>
+      <div class="search-kbd-hint"><kbd>/</kbd> to focus search</div>
+      <div class="autocomplete-dropdown" id="autocompleteDropdown" hidden></div>
+
+      <div class="trending-wrap">
+        <span class="trending-label">🔥 Trending:</span>
+        <div class="trending-chips" id="trendingChips"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ MAIN LAYOUT ══ -->
+  <main class="main-layout" id="mainContent">
+
+    <!-- Left Sidebar -->
+    <aside class="filter-sidebar" id="filterSidebar">
+      <div class="sidebar-header">
+        <h2><i class="fa-solid fa-sliders"></i> Filters</h2>
+        <button class="clear-filters-btn" id="clearFiltersBtn">Clear all</button>
+      </div>
+
+      <!-- Time Posted -->
+      <div class="filter-section">
+        <label class="filter-section-title">⏱ Time Posted</label>
+        <div class="time-filter-group" id="timeFilter">
+          <button class="time-btn active" data-hours="24">Last 24h 🔥</button>
+          <button class="time-btn" data-hours="48">Last 48h</button>
+          <button class="time-btn" data-hours="168">Last 7 days</button>
+          <button class="time-btn" data-hours="0">All Jobs</button>
+        </div>
+      </div>
+
+      <!-- Source -->
+      <div class="filter-section">
+        <label class="filter-section-title">🌐 Job Source</label>
+        <div class="filter-radio-group" id="sourceFilter">
+          <label class="filter-radio"><input type="radio" name="source" value="all" checked /> All Sources</label>
+          <label class="filter-radio"><input type="radio" name="source" value="muse" /> The Muse</label>
+          <label class="filter-radio"><input type="radio" name="source" value="remotive" /> Remotive (Remote)</label>
+          <label class="filter-radio"><input type="radio" name="source" value="adzuna" /> Adzuna India</label>
+        </div>
+      </div>
+
+      <!-- Experience Level -->
+      <div class="filter-section">
+        <label class="filter-section-title">📊 Experience Level</label>
+        <div class="filter-check-group" id="levelFilter">
+          <label class="filter-check"><input type="checkbox" value="Entry Level" /> Entry Level</label>
+          <label class="filter-check"><input type="checkbox" value="Mid Level" /> Mid Level</label>
+          <label class="filter-check"><input type="checkbox" value="Senior Level" /> Senior Level</label>
+          <label class="filter-check"><input type="checkbox" value="Manager" /> Manager</label>
+          <label class="filter-check"><input type="checkbox" value="Director" /> Director</label>
+        </div>
+      </div>
+
+      <!-- Job Type -->
+      <div class="filter-section">
+        <label class="filter-section-title">💼 Job Type</label>
+        <div class="filter-check-group" id="typeFilter">
+          <label class="filter-check"><input type="checkbox" value="full time" /> Full-time</label>
+          <label class="filter-check"><input type="checkbox" value="part time" /> Part-time</label>
+          <label class="filter-check"><input type="checkbox" value="contract" /> Contract</label>
+          <label class="filter-check"><input type="checkbox" value="internship" /> Internship</label>
+        </div>
+      </div>
+
+      <!-- Work Mode -->
+      <div class="filter-section">
+        <label class="filter-section-title">🌍 Work Mode</label>
+        <div class="filter-check-group">
+          <label class="filter-check"><input type="checkbox" id="remoteFilter" /> Remote Only</label>
+        </div>
+      </div>
+
+      <!-- Recent Searches -->
+      <div class="filter-section" id="recentSection" hidden>
+        <label class="filter-section-title">🕐 Recent Searches</label>
+        <div class="recent-chips" id="recentChips"></div>
+        <button class="clear-recent" id="clearRecent">Clear history</button>
+      </div>
+    </aside>
+
+    <!-- Mobile Filter Toggle -->
+    <button class="mobile-filter-btn" id="mobileFilterBtn">
+      <i class="fa-solid fa-sliders"></i> Filters
+    </button>
+
+    <!-- Results Section -->
+    <section class="results-section">
+      <div class="results-header" id="resultsHeader" hidden>
+        <div class="results-meta">
+          <h2 class="results-title" id="resultsTitle">Jobs</h2>
+          <span class="results-count" id="resultsCount"></span>
+          <div class="source-pills" id="sourcePills"></div>
+        </div>
+        <div class="view-toggle">
+          <button class="view-btn active" id="gridViewBtn"><i class="fa-solid fa-grip"></i></button>
+          <button class="view-btn" id="listViewBtn"><i class="fa-solid fa-list"></i></button>
+        </div>
+      </div>
+
+      <div class="jobs-grid grid-view" id="jobsGrid"></div>
+
+      <div class="load-more-wrap" id="loadMoreWrap" hidden>
+        <button class="load-more-btn" id="loadMoreBtn">
+          <span>Load More</span><i class="fa-solid fa-chevron-down"></i>
+        </button>
+      </div>
+
+      <div class="empty-state" id="emptyState" hidden>
+        <div class="empty-icon">🔍</div>
+        <h3>No jobs found</h3>
+        <p id="emptySub">Try a different search or broaden your filters.</p>
+        <div class="empty-suggestions" id="emptySuggestions"></div>
+      </div>
+
+      <div class="error-state" id="errorState" hidden>
+        <div class="error-icon">⚡</div>
+        <h3>Something went wrong</h3>
+        <p id="errorMessage">Could not fetch jobs right now.</p>
+        <button class="retry-btn" id="retryBtn">Try Again</button>
+      </div>
+    </section>
+  </main>
+
+  <!-- ══ SAVED PANEL ══ -->
+  <div class="panel-overlay" id="panelOverlay"></div>
+  <aside class="saved-panel" id="savedPanel">
+    <div class="panel-header">
+      <h2><i class="fa-solid fa-bookmark"></i> Saved Jobs</h2>
+      <button class="panel-close" id="panelClose"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="panel-body">
+      <div class="saved-empty" id="savedEmpty">
+        <div class="saved-empty-icon">💼</div>
+        <p>No saved jobs yet.</p>
+        <span>Bookmark any job to save it here.</span>
+      </div>
+      <div class="saved-list" id="savedList"></div>
+    </div>
+  </aside>
+
+  <!-- ══ JOB MODAL ══ -->
+  <div class="modal-overlay" id="modalOverlay"></div>
+  <div class="job-modal" id="jobModal" role="dialog" aria-modal="true" hidden>
+    <div class="modal-header">
+      <button class="modal-back" id="modalBack"><i class="fa-solid fa-arrow-left"></i> Back</button>
+      <button class="modal-close" id="modalClose"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="modal-body" id="modalBody"></div>
+  </div>
+
+  <!-- ══ GAME MODAL ══ -->
+  <div class="modal-overlay" id="gameModalOverlay"></div>
+  <div class="game-modal" id="gameModal" hidden>
+    <div class="modal-header">
+      <span class="game-modal-title" id="gameModalTitle"></span>
+      <button class="modal-close" id="gameModalClose"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="game-modal-body" id="gameModalBody"></div>
+  </div>
+
+  <!-- ══ TOAST ══ -->
+  <div class="toast-container" id="toastContainer"></div>
+  <button class="back-to-top" id="backToTop"><i class="fa-solid fa-arrow-up"></i></button>
+
+  <!-- ══ FOOTER ══ -->
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <span class="footer-logo">◈ Recru<em>nex</em></span>
+      <span class="footer-sep">·</span>
+      <span class="footer-note">by Veera Raghavulu</span>
+      <span class="footer-sep">·</span>
+      <span class="footer-note">Powered by <strong>Recrunex</strong></span>
+    </div>
+  </footer>
+
+  <script src="js/config.js"></script>
+  <script src="js/storage.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/games.js"></script>
+  <script src="js/search.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

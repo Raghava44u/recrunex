@@ -1,0 +1,101 @@
+/* ═══════════════════════════════════════════════
+   JobPulse — Animations
+   ═══════════════════════════════════════════════ */
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(0.85); }
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+@keyframes cardIn {
+  from {
+    opacity: 0;
+    transform: translateY(16px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes slideInLeft {
+  from { opacity: 0; transform: translateX(-20px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes toastIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes toastOut {
+  from { opacity: 1; transform: scale(1); }
+  to { opacity: 0; transform: scale(0.85); }
+}
+
+@keyframes badgePulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(249, 115, 22, 0.4); }
+  50% { box-shadow: 0 0 0 4px rgba(249, 115, 22, 0); }
+}
+
+@keyframes heroFloat {
+  0%, 100% { transform: translateX(-60%) translateY(0); }
+  50% { transform: translateX(-60%) translateY(-20px); }
+}
+
+.hero-orb-1 { animation: heroFloat 8s ease-in-out infinite; }
+
+/* Staggered card entrance */
+.job-card:nth-child(1) { animation-delay: 0ms; }
+.job-card:nth-child(2) { animation-delay: 40ms; }
+.job-card:nth-child(3) { animation-delay: 80ms; }
+.job-card:nth-child(4) { animation-delay: 120ms; }
+.job-card:nth-child(5) { animation-delay: 160ms; }
+.job-card:nth-child(6) { animation-delay: 200ms; }
+.job-card:nth-child(7) { animation-delay: 240ms; }
+.job-card:nth-child(8) { animation-delay: 280ms; }
+.job-card:nth-child(n+9) { animation-delay: 320ms; }
+
+/* Hero entrance */
+.hero-badge { animation: cardIn 0.5s ease both 0.1s; }
+.hero-title { animation: cardIn 0.5s ease both 0.2s; }
+.hero-sub { animation: cardIn 0.5s ease both 0.3s; }
+.search-card { animation: cardIn 0.5s ease both 0.4s; }
+.trending-wrap { animation: cardIn 0.5s ease both 0.5s; }
+
+/* Micro-interactions */
+.save-btn:active { transform: scale(0.88); }
+.apply-btn:active { transform: scale(0.96); }
+.chip:active { transform: scale(0.95); }
+
+/* Smooth theme transition */
+body, .topbar, .search-card, .job-card, .results-header, .saved-panel {
+  transition-property: background, color, border-color, box-shadow;
+  transition-duration: 0.25s;
+  transition-timing-function: ease;
+}

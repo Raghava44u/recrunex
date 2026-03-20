@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Recrunex</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <link rel="stylesheet" href="popup.css" />
+</head>
+<body>
+
+  <!-- Header -->
+  <header class="header">
+    <div class="logo">
+      <span class="logo-icon">◈</span>
+      <span class="logo-text">Recru<em>nex</em></span>
+    </div>
+    <div class="header-actions">
+      <button class="icon-btn" id="alertToggle" title="Job Alerts">
+        <i class="fa-solid fa-bell" id="bellIcon"></i>
+      </button>
+      <button class="icon-btn" id="openApp" title="Open full app">
+        <i class="fa-solid fa-arrow-up-right-from-square"></i>
+      </button>
+    </div>
+  </header>
+
+  <!-- Search Bar -->
+  <div class="search-wrap">
+    <div class="search-row">
+      <div class="input-wrap">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        <input type="text" id="searchInput" placeholder="Role, skill, company..." autocomplete="off" />
+      </div>
+      <div class="input-wrap loc">
+        <i class="fa-solid fa-location-dot"></i>
+        <input type="text" id="locationInput" placeholder="Delhi, Remote..." autocomplete="off" />
+      </div>
+    </div>
+    <button class="search-btn" id="searchBtn">
+      <i class="fa-solid fa-magnifying-glass"></i> Search
+    </button>
+  </div>
+
+  <!-- Filter Tabs -->
+  <div class="filter-tabs">
+    <button class="tab active" data-hours="24">🔥 24h</button>
+    <button class="tab" data-hours="48">⚡ 48h</button>
+    <button class="tab" data-hours="168">📅 7d</button>
+    <button class="tab" data-hours="0">All</button>
+  </div>
+
+  <!-- Status Bar -->
+  <div class="status-bar" id="statusBar">
+    <span class="status-dot"></span>
+    <span id="statusText">Loading fresh jobs...</span>
+  </div>
+
+  <!-- Job List -->
+  <div class="job-list" id="jobList">
+    <div class="loading-wrap" id="loadingWrap">
+      <div class="spinner"></div>
+      <span>Fetching fresh jobs…</span>
+    </div>
+  </div>
+
+  <!-- Alert Setup Panel -->
+  <div class="alert-panel" id="alertPanel" hidden>
+    <div class="alert-panel-header">
+      <span>🔔 Job Alerts</span>
+      <button id="closeAlert"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="alert-panel-body">
+      <p class="alert-desc">Get notified when new jobs matching your search are posted.</p>
+      <label class="alert-label">Search keyword</label>
+      <input type="text" id="alertKeyword" placeholder="e.g. Frontend Developer" class="alert-input" />
+      <label class="alert-label">Location (optional)</label>
+      <input type="text" id="alertLocation" placeholder="e.g. Bangalore" class="alert-input" />
+      <label class="alert-label">Check every</label>
+      <select id="alertFreq" class="alert-select">
+        <option value="30">30 minutes</option>
+        <option value="60" selected>1 hour</option>
+        <option value="180">3 hours</option>
+        <option value="360">6 hours</option>
+      </select>
+      <button class="alert-save-btn" id="saveAlert">
+        <i class="fa-solid fa-bell"></i> Enable Alerts
+      </button>
+      <div class="active-alerts" id="activeAlerts"></div>
+    </div>
+  </div>
+
+  <!-- Empty State -->
+  <div class="empty-state" id="emptyState" hidden>
+    <div class="empty-icon">🔍</div>
+    <p>No fresh jobs found.</p>
+    <small>Try "All" tab or a broader keyword.</small>
+  </div>
+
+  <!-- Footer -->
+  <div class="ext-footer">
+    <span>Powered by <strong>Recrunex</strong></span>
+    <button class="footer-link" id="openFull">Open Full App →</button>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>
