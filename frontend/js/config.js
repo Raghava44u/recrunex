@@ -1,6 +1,6 @@
 // ── App Config ────────────────────────────────────────────────────────────────
 const CONFIG = {
-  API_BASE: 'http://localhost:3001/api',
+  API_BASE: 'https://recrunex-24hr.onrender.com/api',
   DEBOUNCE_DELAY: 300,
   MAX_RECENT_SEARCHES: 6,
   MAX_SAVED_JOBS: 50,
