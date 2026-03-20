@@ -1,5 +1,5 @@
 // ══ Recrunex Extension Popup ══════════════════════════════════════════════════
-const API_BASE = 'http://localhost:3001/api';
+const API_BASE = 'https://recrunex-24hr.onrender.com/api';
 
 // ── State ──────────────────────────────────────────────────────────────────────
 const state = {
@@ -258,8 +258,8 @@ function setupListeners() {
   $('saveAlert').addEventListener('click', saveAlert);
 
   // Open full app
-  $('openApp').addEventListener('click', () => chrome.tabs?.create({ url:'http://127.0.0.1:5500/frontend/' }));
-  $('openFull').addEventListener('click', () => chrome.tabs?.create({ url:'http://127.0.0.1:5500/frontend/' }));
+  $('openApp').addEventListener('click', () => chrome.tabs?.create({ url:'https://recrunex-phi.vercel.app/' }));
+  $('openFull').addEventListener('click', () => chrome.tabs?.create({ url:'https://recrunex-phi.vercel.app/' }));
 }
 
 function doSearch() {
