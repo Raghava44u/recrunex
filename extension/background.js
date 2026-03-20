@@ -71,6 +71,6 @@ chrome.notifications.onButtonClicked.addListener((notifId, btnIdx) => {
 });
 
 chrome.notifications.onClicked.addListener(notifId => {
-  chrome.tabs.create({ url: 'http://127.0.0.1:5500/frontend/' });
+  chrome.tabs.create({ url: 'https://recrunex-phi.vercel.app/' });
   chrome.notifications.clear(notifId);
 });
