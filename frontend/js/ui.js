@@ -39,9 +39,10 @@ const UI = (() => {
 
   function srcClass(source) {
     if (!source) return '';
-    if (/muse/i.test(source)) return 'muse';
+    if (/muse/i.test(source))     return 'muse';
     if (/remotive/i.test(source)) return 'remotive';
-    if (/adzuna/i.test(source)) return 'adzuna';
+    if (/adzuna/i.test(source))   return 'adzuna';
+    if (/jooble/i.test(source))   return 'jooble';
     return '';
   }
 

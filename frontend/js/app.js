@@ -277,6 +277,12 @@ const App = (() => {
       renderSourcePills(data.sources || []);
       applyClientFilters();
 
+      // 🤖 AI Resume Match — delay so cards are painted in DOM first
+      if (typeof AIMatch !== 'undefined') {
+        // Pass ALL fetched jobs (not just newJobs) so badges persist on load more
+        setTimeout(() => AIMatch.run(state.currentQuery, state.allFetchedJobs), 600);
+      }
+
     } catch(err) {
       console.error('[Search]', err.message);
       showPanel('error');
@@ -589,12 +595,20 @@ const App = (() => {
     const sentinel = document.createElement('div');
     sentinel.style.height = '1px';
     els.loadMoreWrap.after(sentinel);
+    // Only trigger infinite scroll AFTER user has done at least one search
+    // and only if there's actually more pages — prevents firing on load
     new IntersectionObserver(entries => {
-      if (entries[0].isIntersecting && !state.isLoading && state.hasSearched && state.currentPage < state.totalPages-1) {
+      if (
+        entries[0].isIntersecting &&
+        !state.isLoading &&
+        state.hasSearched &&
+        state.currentPage < state.totalPages - 1 &&
+        state.totalPages > 1
+      ) {
         state.currentPage++;
         triggerSearch(true);
       }
-    }, { rootMargin:'200px' }).observe(sentinel);
+    }, { rootMargin:'100px', threshold: 0.1 }).observe(sentinel);
 
     // Initial load
     triggerSearch(false);

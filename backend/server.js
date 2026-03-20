@@ -55,13 +55,20 @@ const searchLim = rateLimit({ windowMs:60*1000, max:60 });
 const san = s => s ? String(s).replace(/[<>'"`;]/g,'').trim().slice(0,100) : '';
 function timeAgo(d) {
   if (!d) return 'Unknown';
-  const diff = Date.now() - new Date(d).getTime();
-  const m=Math.floor(diff/60000), h=Math.floor(diff/3600000), dy=Math.floor(diff/86400000);
-  if (m<1) return 'Just now';
-  if (m<60) return `${m}m ago`;
-  if (h<24) return `${h}h ago`;
-  if (dy===1) return 'Yesterday';
-  return `${dy}d ago`;
+  const date = new Date(d);
+  if (isNaN(date.getTime())) return 'Unknown';
+  const diff = Date.now() - date.getTime();
+  if (diff < 0) return 'Just posted';
+  const m  = Math.floor(diff / 60000);
+  const h  = Math.floor(diff / 3600000);
+  const dy = Math.floor(diff / 86400000);
+  if (m < 2)   return 'Just now';
+  if (m < 60)  return `${m}m ago`;
+  if (h < 24)  return `${h}h ago`;
+  if (dy === 1) return 'Yesterday';
+  if (dy < 7)  return `${dy}d ago`;
+  if (dy < 30) return `${Math.floor(dy/7)}w ago`;
+  return `${Math.floor(dy/30)}mo ago`;
 }
 const within24h = d => !!d && (Date.now()-new Date(d).getTime() < 86400000);
 const withinNh  = (d,n) => !!d && (Date.now()-new Date(d).getTime() < n*3600000);
@@ -185,7 +192,7 @@ async function fetchAdzuna(q, loc, page) {
       categories:      [j.category?.label].filter(Boolean),
       levels:          [],
       type:            j.contract_time === 'part_time' ? 'Part-time' : 'Full-time',
-      publicationDate: j.created,
+      publicationDate: j.created ? new Date(j.created).toISOString() : null,
       applyUrl:        j.redirect_url,
       tags:            [j.category?.label].filter(Boolean),
       snippet:         strip(j.description||'').slice(0,220),
@@ -197,6 +204,67 @@ async function fetchAdzuna(q, loc, page) {
     return { jobs, total, pageCount: Math.ceil(total/10) };
   } catch(e) {
     console.error('[Adzuna]', e.message);
+    return { jobs:[], total:0, pageCount:1 };
+  }
+}
+
+
+// ── Jooble Fetcher ─────────────────────────────────────────────────────────────
+async function fetchJooble(q, loc, page) {
+  try {
+    const apiKey = process.env.JOOBLE_API_KEY;
+    if (!apiKey) { console.warn('[Jooble] No API key'); return { jobs:[], total:0, pageCount:1 }; }
+
+    const body = {
+      keywords:     q || 'developer',
+      location:     loc || 'india',
+      page:         (page || 0) + 1,
+      resultonpage: 20,
+    };
+
+    const r = await axios.post(
+      `https://jooble.org/api/${apiKey}`,
+      body,
+      { headers: { 'Content-Type': 'application/json' }, timeout: 12000 }
+    );
+
+    const results = r.data?.jobs || [];
+    const total   = parseInt(r.data?.totalCount) || results.length;
+
+    const jobs = results.map(j => {
+      // Jooble updated field format: "2026-03-20T10:30:00+0000"
+      let pubDate = null;
+      if (j.updated) {
+        const parsed = new Date(j.updated);
+        pubDate = isNaN(parsed.getTime()) ? null : parsed.toISOString();
+      }
+      return norm({
+        id:              `jooble_${j.id || Buffer.from(j.title||'').toString('base64').slice(0,12)}`,
+        title:           j.title || 'Position',
+        company:         j.company || 'Company',
+        companyLogo:     j.company
+          ? `https://logo.clearbit.com/${j.company.toLowerCase().replace(/[^a-z0-9]/g,'')}.com`
+          : null,
+        primaryLocation: j.location || loc || 'India',
+        locations:       [j.location || loc || 'India'],
+        categories:      [j.type].filter(Boolean),
+        levels:          [],
+        type:            j.type || 'Full-time',
+        publicationDate: pubDate,
+        applyUrl:        j.link || '#',
+        tags:            [j.type, j.location].filter(Boolean),
+        snippet:         strip(j.snippet || '').slice(0, 220),
+        fullDescription: strip(j.snippet || ''),
+        source:          'Jooble',
+        salary:          j.salary || null,
+        remote:          /remote/i.test(j.location || '') || /remote/i.test(j.snippet || ''),
+      });
+    });
+
+    console.log(`[Jooble] ${jobs.length} jobs fetched`);
+    return { jobs, total, pageCount: Math.ceil(total / 20) || 1 };
+  } catch (e) {
+    console.error('[Jooble]', e.response?.status, e.message);
     return { jobs:[], total:0, pageCount:1 };
   }
 }
@@ -231,12 +299,14 @@ app.get('/api/jobs', searchLim,
       const wantMuse     = !src || src === 'all' || src === 'muse';
       const wantRemotive = !src || src === 'all' || src === 'remotive';
       const isIndia      = /india|delhi|mumbai|bangalore|bengaluru|hyderabad|chennai|pune|kolkata|noida|gurugram|gurgaon/i.test((loc+' '+q).trim());
-      const wantAdzuna   = src === 'adzuna' || (!src || src === 'all') && isIndia;
+      const wantAdzuna   = src === 'adzuna' || ((!src || src === 'all') && isIndia);
+      const wantJooble   = !src || src === 'all' || src === 'jooble';
 
       const fetches = [];
       if (wantMuse)     fetches.push(fetchMuse(q, loc, page, level));
       if (wantRemotive) fetches.push(fetchRemotive(q));
       if (wantAdzuna)   fetches.push(fetchAdzuna(q, loc, page));
+      if (wantJooble)   fetches.push(fetchJooble(q, loc, page));
 
       const settled = await Promise.allSettled(fetches);
       let all = [], total = 0, pageCount = 1;
@@ -292,6 +362,8 @@ app.get('/api/jobs', searchLim,
     }
   }
 );
+
+app.get('/api/cache/clear', (req, res) => { cache.clear(); res.json({ cleared:true }); });
 
 app.get('/api/trending', (req, res) => res.json({ trending:[
   { query:'Software Engineer',      icon:'💻', hot:true  },
