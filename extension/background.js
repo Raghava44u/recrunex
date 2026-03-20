@@ -1,7 +1,7 @@
 // ══ Recrunex Background Service Worker ═══════════════════════════════════════
 // Handles job alert alarms and notifications
 
-const API_BASE = 'http://localhost:3001/api';
+const API_BASE = 'https://recrunex-24hr.onrender.com/api';
 
 // ── Alarm handler ──────────────────────────────────────────────────────────────
 chrome.alarms.onAlarm.addListener(async alarm => {
@@ -65,7 +65,7 @@ async function checkAlerts() {
 // ── Notification click → open app ─────────────────────────────────────────────
 chrome.notifications.onButtonClicked.addListener((notifId, btnIdx) => {
   if (btnIdx === 0) {
-    chrome.tabs.create({ url: 'http://127.0.0.1:5500/frontend/' });
+    chrome.tabs.create({ url: 'https://recrunex-phi.vercel.app/' });
   }
   chrome.notifications.clear(notifId);
 });
