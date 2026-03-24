@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Recrunex - Fresh Jobs, Instantly</title>
+  <title>Recrunex — Fresh Jobs, Instantly</title>
   <meta name="description" content="Find jobs posted in the last 24 hours. India & global. Recrunex by Veera Raghavulu." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -52,12 +52,6 @@
           </div>
         </div>
 
-        <button class="nav-btn resume-nav-btn" id="resumeNavBtn">
-          <i class="fa-solid fa-file-lines"></i>
-          <span>Resume</span>
-          <span class="resume-loaded-dot" id="resumeLoadedDot" hidden></span>
-        </button>
-
         <button class="nav-btn" id="savedNavBtn">
           <i class="fa-solid fa-bookmark"></i>
           <span>Saved</span>
@@ -82,6 +76,13 @@
     </div>
   </header>
 
+
+  <!-- ══ Backend Status Banner ══ -->
+  <div class="backend-banner" id="backendBanner" hidden>
+    <i class="fa-solid fa-triangle-exclamation"></i>
+    <span>Backend not running. Open terminal → <code>cd backend && npm install && node server.js</code></span>
+    <button onclick="this.parentElement.setAttribute('hidden','')"><i class="fa-solid fa-xmark"></i></button>
+  </div>
   <!-- ══ HERO ══ -->
   <section class="hero" id="heroSection">
     <div class="hero-bg-grid"></div>
@@ -146,7 +147,6 @@
           <label class="filter-radio"><input type="radio" name="source" value="muse" /> The Muse</label>
           <label class="filter-radio"><input type="radio" name="source" value="remotive" /> Remotive (Remote)</label>
           <label class="filter-radio"><input type="radio" name="source" value="adzuna" /> Adzuna India</label>
-          <label class="filter-radio"><input type="radio" name="source" value="jooble" /> Jooble</label>
         </div>
       </div>
 
@@ -273,6 +273,94 @@
   <div class="toast-container" id="toastContainer"></div>
   <button class="back-to-top" id="backToTop"><i class="fa-solid fa-arrow-up"></i></button>
 
+
+  <!-- ══ FEEDBACK SECTION ══ -->
+  <section class="feedback-section" id="feedbackSection">
+    <div class="feedback-inner">
+
+      <!-- Section Header -->
+      <div class="feedback-header">
+        <div class="feedback-header-left">
+          <h2 class="feedback-title">What users are saying</h2>
+          <p class="feedback-sub">Real reviews from real job seekers</p>
+        </div>
+        <div class="feedback-stats" id="feedbackStats">
+          <div class="stat-block">
+            <span class="stat-num" id="avgRating">—</span>
+            <span class="stat-stars" id="avgStars"></span>
+            <span class="stat-label">Average Rating</span>
+          </div>
+          <div class="stat-block">
+            <span class="stat-num" id="totalReviews">—</span>
+            <span class="stat-label">Total Reviews</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Review Cards -->
+      <div class="reviews-grid" id="reviewsGrid">
+        <div class="reviews-loading">
+          <div class="rev-spinner"></div>
+          <span>Loading reviews…</span>
+        </div>
+      </div>
+
+      <!-- Write Review -->
+      <div class="write-review-wrap">
+        <div class="write-review-card" id="writeReviewCard">
+          <h3 class="write-title">⭐ Share Your Experience</h3>
+          <p class="write-sub">Help others by reviewing Recrunex</p>
+
+          <div class="review-form" id="reviewForm">
+            <!-- Name + Role row -->
+            <div class="form-row">
+              <div class="form-field">
+                <label class="form-label">Your Name *</label>
+                <input type="text" id="reviewName" class="form-input" placeholder="e.g. Priya Sharma" maxlength="40" />
+              </div>
+              <div class="form-field">
+                <label class="form-label">Your Role (optional)</label>
+                <input type="text" id="reviewRole" class="form-input" placeholder="e.g. Frontend Developer" maxlength="50" />
+              </div>
+            </div>
+
+            <!-- Star Rating -->
+            <div class="form-field">
+              <label class="form-label">Rating *</label>
+              <div class="star-picker" id="starPicker">
+                <button class="star-btn" data-val="1">★</button>
+                <button class="star-btn" data-val="2">★</button>
+                <button class="star-btn" data-val="3">★</button>
+                <button class="star-btn" data-val="4">★</button>
+                <button class="star-btn" data-val="5">★</button>
+              </div>
+              <span class="star-label" id="starLabel">Click to rate</span>
+            </div>
+
+            <!-- Review Text -->
+            <div class="form-field">
+              <label class="form-label">Your Review * <span class="char-count" id="charCount">0/300</span></label>
+              <textarea id="reviewText" class="form-textarea" placeholder="Share your experience with Recrunex — what did you find helpful?" maxlength="300" rows="3"></textarea>
+            </div>
+
+            <button class="submit-review-btn" id="submitReviewBtn">
+              <i class="fa-solid fa-paper-plane"></i> Submit Review
+            </button>
+          </div>
+
+          <!-- Success state -->
+          <div class="review-success" id="reviewSuccess" hidden>
+            <div class="success-icon">🎉</div>
+            <h4>Thank you for your review!</h4>
+            <p>Your feedback helps others find fresh jobs faster.</p>
+            <button class="write-another-btn" id="writeAnotherBtn">Write Another</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
   <!-- ══ FOOTER ══ -->
   <footer class="site-footer">
     <div class="footer-inner">
@@ -284,45 +372,110 @@
     </div>
   </footer>
 
+
+  <!-- ══ FEEDBACK BUTTON ══ -->
+  <button class="feedback-fab" id="feedbackFab" title="Share Feedback">
+    <i class="fa-solid fa-comment-dots"></i>
+    <span class="fab-label">Feedback</span>
+  </button>
+
+  <!-- ══ FEEDBACK MODAL ══ -->
+  <div class="modal-overlay" id="feedbackOverlay"></div>
+  <div class="feedback-modal" id="feedbackModal" hidden>
+    <div class="feedback-modal-inner">
+
+      <!-- Header -->
+      <div class="fm-header">
+        <div class="fm-title">
+          <i class="fa-solid fa-comments"></i>
+          Community Feedback
+        </div>
+        <button class="fm-close" id="feedbackClose"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+
+      <!-- Tabs -->
+      <div class="fm-tabs">
+        <button class="fm-tab active" data-tab="write">✍️ Write</button>
+        <button class="fm-tab" data-tab="wall">🌍 Everyone's Feedback</button>
+      </div>
+
+      <!-- Write Tab -->
+      <div class="fm-body" id="fmWrite">
+        <div class="fm-form">
+          <div class="fm-field">
+            <label>Your Name <span class="fm-opt">(optional)</span></label>
+            <input type="text" id="fbName" placeholder="e.g. Veera" maxlength="50" class="fm-input" />
+          </div>
+
+          <div class="fm-field">
+            <label>Feedback Type</label>
+            <div class="fm-type-chips" id="fbTypeChips">
+              <button class="fm-type-chip active" data-type="general">💬 General</button>
+              <button class="fm-type-chip" data-type="bug">🐛 Bug</button>
+              <button class="fm-type-chip" data-type="feature">✨ Feature Request</button>
+              <button class="fm-type-chip" data-type="love">❤️ Love it!</button>
+            </div>
+          </div>
+
+          <div class="fm-field">
+            <label>Rating</label>
+            <div class="fm-stars" id="fbStars">
+              <button class="star" data-val="1">★</button>
+              <button class="star" data-val="2">★</button>
+              <button class="star" data-val="3">★</button>
+              <button class="star" data-val="4">★</button>
+              <button class="star" data-val="5">★</button>
+            </div>
+          </div>
+
+          <div class="fm-field">
+            <label>Your Message <span class="fm-req">*</span></label>
+            <textarea id="fbMessage" placeholder="Tell us what you think, what to improve, or what you love..." class="fm-textarea" maxlength="500" rows="4"></textarea>
+            <div class="fm-char-count"><span id="fbCharCount">0</span>/500</div>
+          </div>
+
+          <button class="fm-submit" id="fbSubmit">
+            <i class="fa-solid fa-paper-plane"></i> Submit Feedback
+          </button>
+
+          <div class="fm-success" id="fbSuccess" hidden>
+            <i class="fa-solid fa-circle-check"></i>
+            Thanks! Your feedback is now visible to everyone 🎉
+          </div>
+        </div>
+      </div>
+
+      <!-- Wall Tab -->
+      <div class="fm-body" id="fmWall" hidden>
+        <div class="fm-wall-controls">
+          <div class="fm-filter-chips">
+            <button class="fm-filter active" data-filter="all">All</button>
+            <button class="fm-filter" data-filter="love">❤️ Love</button>
+            <button class="fm-filter" data-filter="feature">✨ Features</button>
+            <button class="fm-filter" data-filter="bug">🐛 Bugs</button>
+          </div>
+          <button class="fm-refresh" id="fmRefresh" title="Refresh">
+            <i class="fa-solid fa-rotate"></i>
+          </button>
+        </div>
+        <div class="fm-wall-list" id="fmWallList">
+          <div class="fm-loading">
+            <div class="fm-spinner"></div>
+            Loading feedback…
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
   <script src="js/config.js"></script>
   <script src="js/storage.js"></script>
   <script src="js/api.js"></script>
   <script src="js/ui.js"></script>
-  <script src="js/ai-match.js"></script>
   <script src="js/games.js"></script>
   <script src="js/search.js"></script>
+  <script src="js/feedback.js"></script>
   <script src="js/app.js"></script>
-
-  <!-- ══ RESUME MODAL ══ -->
-  <div class="modal-overlay" id="resumeModalOverlay"></div>
-  <div class="resume-modal" id="resumeModal" hidden>
-    <div class="modal-header">
-      <span style="font-family:var(--font-display);font-weight:700;font-size:1rem;">📄 Add Your Resume</span>
-      <button class="modal-close" id="resumeModalClose"><i class="fa-solid fa-xmark"></i></button>
-    </div>
-    <div class="resume-modal-body">
-      <div class="resume-loaded-bar" id="resumeLoadedBar" hidden>
-        <span class="resume-loaded-info" id="resumeLoadedInfo"></span>
-        <button class="resume-remove-btn" id="resumeRemoveBtn"><i class="fa-solid fa-trash"></i> Remove</button>
-      </div>
-      <div class="resume-upload-zone" id="resumeUploadZone">
-        <input type="file" id="resumeFileInput" accept=".pdf,.doc,.docx,.txt" hidden />
-        <div class="upload-zone-icon">📂</div>
-        <p class="upload-zone-title">Drop your resume here</p>
-        <p class="upload-zone-sub">PDF, DOCX or TXT supported</p>
-        <button class="upload-zone-btn" id="resumeUploadBtn">
-          <i class="fa-solid fa-upload"></i> Browse File
-        </button>
-      </div>
-      <div class="resume-divider"><span>or paste text</span></div>
-      <textarea id="resumePasteInput" class="resume-paste-area"
-        placeholder="Paste your resume text here...&#10;&#10;Skills: React, Node.js, Python, AWS&#10;Experience: 3 years as Frontend Developer..."
-        rows="7" maxlength="8000"></textarea>
-      <button class="resume-analyse-btn-main" id="resumeAnalyseBtn">
-        <i class="fa-solid fa-wand-magic-sparkles"></i> Analyse &amp; Score Jobs
-      </button>
-      <div class="resume-status-main" id="resumeStatusMain" hidden></div>
-    </div>
-  </div>
 </body>
 </html>

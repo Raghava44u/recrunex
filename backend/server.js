@@ -28,10 +28,11 @@ function toCache(key, data) {
 // ── Security ───────────────────────────────────────────────────────────────────
 app.use(helmet({ contentSecurityPolicy: false, crossOriginEmbedderPolicy: false }));
 const ORIGINS = [
-  'https://recrunex.vercel.app',      // future frontend
-  'https://recrunex-24hr.onrender.com',
-  'http://localhost:5500',
-  'http://127.0.0.1:5500',
+  'http://localhost:5500','http://127.0.0.1:5500',
+  'http://localhost:5501','http://127.0.0.1:5501',
+  'http://localhost:3000','http://127.0.0.1:3000',
+  'http://localhost:3001','http://127.0.0.1:3001',
+  'http://localhost:8080','http://127.0.0.1:8080','null',
 ];
 // Dev-friendly CORS: allow all localhost/127 origins + null (file://)
 app.use(cors({
@@ -44,7 +45,7 @@ app.use(cors({
     console.warn('[CORS blocked]', origin);
     return cb(null, true); // TEMP: allow all during dev
   },
-  methods: ['GET', 'OPTIONS'],
+  methods: ['GET', 'POST', 'OPTIONS'],
   optionsSuccessStatus: 200,
 }));
 app.use(express.json({ limit:'10kb' }));
@@ -55,20 +56,13 @@ const searchLim = rateLimit({ windowMs:60*1000, max:60 });
 const san = s => s ? String(s).replace(/[<>'"`;]/g,'').trim().slice(0,100) : '';
 function timeAgo(d) {
   if (!d) return 'Unknown';
-  const date = new Date(d);
-  if (isNaN(date.getTime())) return 'Unknown';
-  const diff = Date.now() - date.getTime();
-  if (diff < 0) return 'Just posted';
-  const m  = Math.floor(diff / 60000);
-  const h  = Math.floor(diff / 3600000);
-  const dy = Math.floor(diff / 86400000);
-  if (m < 2)   return 'Just now';
-  if (m < 60)  return `${m}m ago`;
-  if (h < 24)  return `${h}h ago`;
-  if (dy === 1) return 'Yesterday';
-  if (dy < 7)  return `${dy}d ago`;
-  if (dy < 30) return `${Math.floor(dy/7)}w ago`;
-  return `${Math.floor(dy/30)}mo ago`;
+  const diff = Date.now() - new Date(d).getTime();
+  const m=Math.floor(diff/60000), h=Math.floor(diff/3600000), dy=Math.floor(diff/86400000);
+  if (m<1) return 'Just now';
+  if (m<60) return `${m}m ago`;
+  if (h<24) return `${h}h ago`;
+  if (dy===1) return 'Yesterday';
+  return `${dy}d ago`;
 }
 const within24h = d => !!d && (Date.now()-new Date(d).getTime() < 86400000);
 const withinNh  = (d,n) => !!d && (Date.now()-new Date(d).getTime() < n*3600000);
@@ -192,7 +186,7 @@ async function fetchAdzuna(q, loc, page) {
       categories:      [j.category?.label].filter(Boolean),
       levels:          [],
       type:            j.contract_time === 'part_time' ? 'Part-time' : 'Full-time',
-      publicationDate: j.created ? new Date(j.created).toISOString() : null,
+      publicationDate: j.created,
       applyUrl:        j.redirect_url,
       tags:            [j.category?.label].filter(Boolean),
       snippet:         strip(j.description||'').slice(0,220),
@@ -204,67 +198,6 @@ async function fetchAdzuna(q, loc, page) {
     return { jobs, total, pageCount: Math.ceil(total/10) };
   } catch(e) {
     console.error('[Adzuna]', e.message);
-    return { jobs:[], total:0, pageCount:1 };
-  }
-}
-
-
-// ── Jooble Fetcher ─────────────────────────────────────────────────────────────
-async function fetchJooble(q, loc, page) {
-  try {
-    const apiKey = process.env.JOOBLE_API_KEY;
-    if (!apiKey) { console.warn('[Jooble] No API key'); return { jobs:[], total:0, pageCount:1 }; }
-
-    const body = {
-      keywords:     q || 'developer',
-      location:     loc || 'india',
-      page:         (page || 0) + 1,
-      resultonpage: 20,
-    };
-
-    const r = await axios.post(
-      `https://jooble.org/api/${apiKey}`,
-      body,
-      { headers: { 'Content-Type': 'application/json' }, timeout: 12000 }
-    );
-
-    const results = r.data?.jobs || [];
-    const total   = parseInt(r.data?.totalCount) || results.length;
-
-    const jobs = results.map(j => {
-      // Jooble updated field format: "2026-03-20T10:30:00+0000"
-      let pubDate = null;
-      if (j.updated) {
-        const parsed = new Date(j.updated);
-        pubDate = isNaN(parsed.getTime()) ? null : parsed.toISOString();
-      }
-      return norm({
-        id:              `jooble_${j.id || Buffer.from(j.title||'').toString('base64').slice(0,12)}`,
-        title:           j.title || 'Position',
-        company:         j.company || 'Company',
-        companyLogo:     j.company
-          ? `https://logo.clearbit.com/${j.company.toLowerCase().replace(/[^a-z0-9]/g,'')}.com`
-          : null,
-        primaryLocation: j.location || loc || 'India',
-        locations:       [j.location || loc || 'India'],
-        categories:      [j.type].filter(Boolean),
-        levels:          [],
-        type:            j.type || 'Full-time',
-        publicationDate: pubDate,
-        applyUrl:        j.link || '#',
-        tags:            [j.type, j.location].filter(Boolean),
-        snippet:         strip(j.snippet || '').slice(0, 220),
-        fullDescription: strip(j.snippet || ''),
-        source:          'Jooble',
-        salary:          j.salary || null,
-        remote:          /remote/i.test(j.location || '') || /remote/i.test(j.snippet || ''),
-      });
-    });
-
-    console.log(`[Jooble] ${jobs.length} jobs fetched`);
-    return { jobs, total, pageCount: Math.ceil(total / 20) || 1 };
-  } catch (e) {
-    console.error('[Jooble]', e.response?.status, e.message);
     return { jobs:[], total:0, pageCount:1 };
   }
 }
@@ -299,14 +232,12 @@ app.get('/api/jobs', searchLim,
       const wantMuse     = !src || src === 'all' || src === 'muse';
       const wantRemotive = !src || src === 'all' || src === 'remotive';
       const isIndia      = /india|delhi|mumbai|bangalore|bengaluru|hyderabad|chennai|pune|kolkata|noida|gurugram|gurgaon/i.test((loc+' '+q).trim());
-      const wantAdzuna   = src === 'adzuna' || ((!src || src === 'all') && isIndia);
-      const wantJooble   = !src || src === 'all' || src === 'jooble';
+      const wantAdzuna   = src === 'adzuna' || (!src || src === 'all') && isIndia;
 
       const fetches = [];
       if (wantMuse)     fetches.push(fetchMuse(q, loc, page, level));
       if (wantRemotive) fetches.push(fetchRemotive(q));
       if (wantAdzuna)   fetches.push(fetchAdzuna(q, loc, page));
-      if (wantJooble)   fetches.push(fetchJooble(q, loc, page));
 
       const settled = await Promise.allSettled(fetches);
       let all = [], total = 0, pageCount = 1;
@@ -363,17 +294,91 @@ app.get('/api/jobs', searchLim,
   }
 );
 
-app.get('/api/cache/clear', (req, res) => { cache.clear(); res.json({ cleared:true }); });
 
+// ══ FEEDBACK — file-based persistence ════════════════════════════════════════
+const fs           = require('fs');
+const REVIEWS_FILE = path.join(__dirname, 'reviews.json');
+
+function loadReviewsFromFile() {
+  try {
+    if (fs.existsSync(REVIEWS_FILE)) return JSON.parse(fs.readFileSync(REVIEWS_FILE, 'utf8')) || [];
+  } catch(e) { console.error('[Reviews] Load error:', e.message); }
+  return [];
+}
+function saveReviewsToFile(reviews) {
+  try { fs.writeFileSync(REVIEWS_FILE, JSON.stringify(reviews, null, 2)); }
+  catch(e) { console.error('[Reviews] Save error:', e.message); }
+}
+
+const feedbackStore = loadReviewsFromFile();
+console.log(`[Reviews] Loaded ${feedbackStore.length} reviews from file`);
+
+const feedbackLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000,
+  max: 5,
+  message: { error: 'Too many reviews. Please wait before submitting again.' }
+});
+
+// GET /api/feedback
+app.get('/api/feedback', (req, res) => {
+  const sorted = [...feedbackStore].sort((a, b) => b.createdAt - a.createdAt);
+  res.json({ reviews: sorted, total: sorted.length });
+});
+
+// POST /api/feedback
+app.post('/api/feedback', feedbackLimiter,
+  [
+    require('express-validator').body('name').isString().isLength({ min:2, max:40 }).trim(),
+    require('express-validator').body('rating').isInt({ min:1, max:5 }),
+    require('express-validator').body('text').isString().isLength({ min:10, max:300 }).trim(),
+    require('express-validator').body('role').optional().isString().isLength({ max:50 }).trim(),
+  ],
+  (req, res) => {
+    const errors = require('express-validator').validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ error: 'Invalid input. Name (2-40 chars), rating (1-5), review (10-300 chars) required.' });
+    }
+    const bad = ['spam','fake','test123'];
+    if (bad.some(w => (req.body.text + req.body.name).toLowerCase().includes(w))) {
+      return res.status(400).json({ error: 'Review flagged. Please write a genuine review.' });
+    }
+    const review = {
+      id:        `rev_${Date.now()}_${Math.random().toString(36).slice(2,7)}`,
+      name:      san(req.body.name),
+      rating:    parseInt(req.body.rating),
+      text:      san(req.body.text),
+      role:      req.body.role ? san(req.body.role) : '',
+      createdAt: Date.now(),
+      date:      new Date().toLocaleDateString('en-IN', { day:'numeric', month:'short', year:'numeric' }),
+      helpful:   0,
+    };
+    feedbackStore.unshift(review);
+    if (feedbackStore.length > 200) feedbackStore.pop();
+    saveReviewsToFile(feedbackStore);
+    console.log(`[Review] ${review.name} gave ${review.rating}⭐`);
+    return res.status(201).json({ success: true, review });
+  }
+);
+
+// POST /api/feedback/:id/helpful
+app.post('/api/feedback/:id/helpful', (req, res) => {
+  const review = feedbackStore.find(r => r.id === req.params.id);
+  if (!review) return res.status(404).json({ error: 'Review not found' });
+  review.helpful = (review.helpful || 0) + 1;
+  saveReviewsToFile(feedbackStore);
+  res.json({ success: true, helpful: review.helpful });
+});
+
+// ── Trending & Health ─────────────────────────────────────────────────────────
 app.get('/api/trending', (req, res) => res.json({ trending:[
-  { query:'Software Engineer',      icon:'💻', hot:true  },
-  { query:'Product Manager',        icon:'🎯', hot:true  },
-  { query:'Data Scientist',         icon:'📊', hot:false },
-  { query:'UX Designer',            icon:'🎨', hot:false },
-  { query:'DevOps Engineer',        icon:'⚙️', hot:true  },
-  { query:'Frontend Developer',     icon:'🖥️', hot:true  },
-  { query:'Full Stack Developer',   icon:'🚀', hot:true  },
-  { query:'Machine Learning',       icon:'🤖', hot:false },
+  { query:'Software Engineer',    icon:'💻', hot:true  },
+  { query:'Product Manager',      icon:'🎯', hot:true  },
+  { query:'Data Scientist',       icon:'📊', hot:false },
+  { query:'UX Designer',          icon:'🎨', hot:false },
+  { query:'DevOps Engineer',      icon:'⚙️', hot:true  },
+  { query:'Frontend Developer',   icon:'🖥️', hot:true  },
+  { query:'Full Stack Developer', icon:'🚀', hot:true  },
+  { query:'Machine Learning',     icon:'🤖', hot:false },
 ]}));
 
 app.get('/api/health', (req, res) => res.json({ status:'ok', uptime:process.uptime(), cacheSize:cache.size }));

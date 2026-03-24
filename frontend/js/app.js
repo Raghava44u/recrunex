@@ -518,6 +518,7 @@ const App = (() => {
     renderRecentSearches();
     updateSavedCount();
     Search.init();
+    if (typeof Feedback !== "undefined") Feedback.init();
 
     // Search bar
     els.searchBtn.addEventListener('click', () => triggerSearch(false));
